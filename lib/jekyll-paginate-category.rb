@@ -1,5 +1,18 @@
 require "jekyll-paginate-category/version"
 
+String.class_eval do
+  def to_slug
+    value = self.dup
+    #.mb_chars.normalize(:kd).gsub(/[^\x00-\x7F]/n, '').to_s
+    value.gsub!(/[']+/, '')
+    value.gsub!(/\W+/, ' ')
+    value.strip!
+    value.downcase!
+    value.gsub!(' ', '-')
+    value
+  end
+end
+
 module Jekyll
   module Paginate
     module Category
@@ -26,7 +39,7 @@ module Jekyll
           @base = site.source
 
           category_dir = site.config['category_dir'] || 'categories'
-          @dir = File.join(category_dir, category)
+          @dir = File.join(category_dir, category.to_slug)
 
           @name = Paginate::Pager.paginate_path(site, num_page)
           @name.concat '/' unless @name.end_with? '/'
